@@ -70,7 +70,7 @@ function createComponent(options, callback)
     {   proxyOptions =
         {   
             // read the server certificate   
-            key: options.inlineCerts ? options.serverPrivateCert : fs.readFileSync(options.serverPrivateCert),
+            key: options.inlineCerts ? options.serverPrivateKey : fs.readFileSync(options.serverPrivateKey),
             cert: options.inlineCerts ? options.serverPublicCert : fs.readFileSync(options.serverPublicCert),
 
             // request client certificate 
@@ -93,7 +93,7 @@ function createComponent(options, callback)
     {   
         serverOptions = 
         {   // read the client certificate   
-            key: options.inlineCerts ? options.clientPrivateCert : fs.readFileSync(options.clientPrivateCert),
+            key: options.inlineCerts ? options.clientPrivateKey : fs.readFileSync(options.clientPrivateKey),
             cert: options.inlineCerts ? options.clientPublicCert : fs.readFileSync(options.clientPublicCert),
 
             // get public server certificate and mark it as approved
