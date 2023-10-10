@@ -22,10 +22,10 @@ function createComponent(options, callback)
 
     function initLogs(options)
     {   
-        if (!options.log_level)
+        if (!options.logLevel)
         {   
-            options.log_level = "log";
-            console.log("did not receive any log level. Using default which is: " + options.log_level);
+            options.logLevel = "log";
+            console.log("did not receive any log level. Using default which is: " + options.logLevel);
 
         }
 
@@ -48,7 +48,7 @@ function createComponent(options, callback)
                 
             }
 
-            if(logLevel === options.log_level)
+            if(logLevel === options.logLevel)
             {   found = true;
             }
 
@@ -70,8 +70,8 @@ function createComponent(options, callback)
     {   proxyOptions =
         {   
             // read the server certificate   
-            key: fs.readFileSync(options.server_private_cert),
-            cert: fs.readFileSync(options.server_public_cert),
+            key: options.inlineCerts ? options.serverPrivateCert : fs.readFileSync(options.serverPrivateCert),
+            cert: options.inlineCerts ? options.serverPublicCert : fs.readFileSync(options.serverPublicCert),
 
             // request client certificate 
             requestCert: true,
@@ -80,7 +80,8 @@ function createComponent(options, callback)
             rejectUnauthorized: true,
 
             // validate the CA of the client certificate
-            ca: [fs.readFileSync(options.client_public_cert)]
+            ca: [options.inlineCerts ? options.clientPublicCert : fs.readFileSync(options.clientPublicCert)]
+
         };
     }
 
@@ -92,11 +93,12 @@ function createComponent(options, callback)
     {   
         serverOptions = 
         {   // read the client certificate   
-            key: fs.readFileSync(options.client_private_cert),
-            cert: fs.readFileSync(options.client_public_cert),
+            key: options.inlineCerts ? options.clientPrivateCert : fs.readFileSync(options.clientPrivateCert),
+            cert: options.inlineCerts ? options.clientPublicCert : fs.readFileSync(options.clientPublicCert),
 
             // get public server certificate and mark it as approved
-            ca: [fs.readFileSync(options.server_public_cert)]
+            ca: [options.inlineCerts ? options.serverPublicCert : fs.readFileSync(options.serverPublicCert)]
+
         };
 
     }
@@ -112,10 +114,10 @@ function createComponent(options, callback)
 
             // connect to the server
             if (isClient)
-            {   serverStream = serverPackage.connect(options.server_port, options.server_host, serverOptions);
+            {   serverStream = serverPackage.connect(options.serverPort, options.serverHost, serverOptions);
             }
             else
-            {   serverStream = serverPackage.connect(options.server_port, options.server_host);
+            {   serverStream = serverPackage.connect(options.serverPort, options.serverHost);
             }
 
             // on secureConnect (for client role only)
@@ -124,10 +126,10 @@ function createComponent(options, callback)
                     log.log("Connected to the ssltunnel server");
 
                     // set TCP keep-alive if needed
-                    if (options.keep_alive >= 0)
-                    {   log.info("Using TCP Keep-Alive with delay: " + options.keep_alive);
-                        //serverStream.socket.setKeepAlive(true, options.keep_alive);
-                        serverStream.setKeepAlive(true, options.keep_alive);
+                    if (options.keepAlive >= 0)
+                    {   log.info("Using TCP Keep-Alive with delay: " + options.keepAlive);
+                        //serverStream.socket.setKeepAlive(true, options.keepAlive);
+                        serverStream.setKeepAlive(true, options.keepAlive);
                     } 
 
                     // pipe service stream to client stream
@@ -149,8 +151,8 @@ function createComponent(options, callback)
                     // resume the client stream
                     //serverStream.pipe(clientStream);
                     //clientStream.pipe(serverStream);
-                    log.info("Using TCP Keep-Alive with delay: " + options.keep_alive);
-                        serverStream.setKeepAlive(true, options.keep_alive);
+                    log.info("Using TCP Keep-Alive with delay: " + options.keepAlive);
+                        serverStream.setKeepAlive(true, options.keepAlive);
                     clientStream.resume();
                 });
 
@@ -202,7 +204,7 @@ function createComponent(options, callback)
         });
 
   
-    server.listen(options.proxy_port);
+    server.listen(options.proxyPort);
 
     
     // Calls the callback when the server is in listening state with the actual port
@@ -210,11 +212,11 @@ function createComponent(options, callback)
         {
             if(isClient)
             {   log.info(`Running "client" role. Listening on ${server.address().port}, \
-                    encrypting and forwarding to ssltunnel's server on ${options.server_host}:${options.server_port}`);
+                    encrypting and forwarding to ssltunnel's server on ${options.serverHost}:${options.serverPort}`);
             }
             else
             {   log.info(`Running "server" role. Listening on ${server.address().port} \
-                    , decrypting and forwarding to real server machine on ${options.server_host}:${options.server_port}`);
+                    , decrypting and forwarding to real server machine on ${options.serverHost}:${options.serverPort}`);
             }
 
             if(callback)
