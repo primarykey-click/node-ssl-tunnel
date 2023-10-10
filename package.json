@@ -1,0 +1,17 @@
+{
+  "name": "node-ssl-tunnel",
+  "version": "1.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/primarykey-click/node-ssl-tunnel.git"
+  },
+  "main": "ssl-tunnel.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Primary Key",
+  "license": "MIT",
+  "dependencies": {
+  }
+}
